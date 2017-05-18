@@ -29,7 +29,7 @@ std::fstream FillingFileGenerate(std::string fileName, int N, int M)
 	std::fstream fout(fileName, std::ios::out);
 	std::generate(v.begin(), v.end(), rand);
 	for (int i = 0; i < N; i++) {
-		fout << (v[i] % (2 * M) + 1) - M << "\n";
+		fout << (v[i] % (2 * M +1)) - M  << "\n";
 	}
 	fout.close();
 	return fout;
@@ -110,6 +110,8 @@ void ModifyPart(std::deque<int>::iterator first, std::deque<int>::iterator last)
 	try
 	{
 		int sum = SumContainer(first, last);
+		std::cout << "Сумма чисел диапазона: ";
+		std::cout << sum; std::cout << "\n\n";
 		for (std::deque<int>::iterator it = first; it != last; ++it)
 			*it -= sum;
 	}
@@ -194,7 +196,7 @@ void InputParametrs(int &N, int &M)
 	}
 	std::cout << "\nВведите границу диапазона M: ";
 	std::cin >> M;
-	if (M < 0) M = abs(M);
+	M = abs(M);
 	std::cout << std::endl;
 }
 
@@ -307,22 +309,24 @@ int main()
 			bool ok = false;
 			if (ContainerToConsole(dec))
 			{
-				std::cout << "Введите диапозон:\n";
+				std::cout << "Введите диааозон: ([first; last))\n";
 				while (!ok)
 				{
 					std::cout << "индекс начала - ";
 					std::cin >> indexFirst;
 					std::cout << "индекс конца - ";
 					std::cin >> indexLlast;
-					ok = (indexFirst > 0) && (indexFirst <= dec.size()) && (indexLlast <= dec.size() && (indexFirst <= indexLlast));
-					if (!ok) 
-						std::cout << "Диапозон указан неверно, повторите ввод:\n";
+					ok = (indexFirst > 0) && (indexFirst <= dec.size()) && (indexLlast <=( dec.size() +1) && (indexFirst < indexLlast));
+					if (!ok)
+					{
+						std::cout << "Диапазон указан неверно, повторите ввод [1-"; std::cout << (dec.size() + 1); std::cout << "]:\n";
+					}
 				} 
 				std::cout << std::endl;
 
 				NewDec = dec;
 				first = NewDec.begin() + indexFirst - 1;
-				last = NewDec.end() - (NewDec.size() - indexFirst);
+				last = NewDec.begin() + indexLlast - 1;
 
 				ModifyPart(first, last);
 				std::cout << "Полученный контейнер (из каждого числа промежутка вычтена их сумма):\n";
@@ -356,17 +360,26 @@ int main()
 			}
 			break;
 		case 8:
-			if (!dec.empty())
+			if (!NewDec.empty())
+			{
+				fileName = GetFileName();
+				SaveToFile(fileName, NewDec);
+				std::cout << "Сохранен результат\n\n";
+			}
+			else if (!dec.empty())
 			{
 				fileName = GetFileName();
 				SaveToFile(fileName, dec);
-				std::cout << "Сохранено\n\n";
+				std::cout << "Сохранен контейнер\n\n";
 			}
 			else
 				std::cout << "Контейнер пуст\n\n";
 			break;
 		case 9:
-			ContainerToConsole(dec);
+			if (!NewDec.empty())
+				ContainerToConsole(NewDec);
+			else
+				ContainerToConsole(dec);
 			break;
 		case 0:
 			return 0;
